@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Protótipo v4 — Diagnóstico Harvie (decisor + prova social + cruzamento de segmento)</title>
+</head>
+<body>
+
+<div id="quiz"></div>
+<div id="resultado" style="display:none;"></div>
+
+<script>
+/*
+  MUDANÇAS DA v3 PRA v4 (todas testadas isoladamente em Node antes de entrar aqui):
+
+  1) SUB-PERGUNTA CONDICIONAL DE DECISOR (resolve o "Cenário 2" documentado na
+     persona Marcelo/Pro Plus: sócio mais novo propõe, sócio mais velho decide).
+     Só aparece pra quem responde "Eu e mais alguém" na Q4. Não pesa no ritmo de
+     quem decide sozinho ou em comitê. Além de virar um alerta no bloco de uso
+     interno, também refina o cálculo de Estrutura: "preciso convencer alguém"
+     conta como decisão mais lenta, igual comitê — "decidimos juntos, no mesmo
+     nível" continua contando como ágil.
+
+  2) PERGUNTA DE PROVA SOCIAL (universal, os dois branches). O próprio
+     Diagnóstico Coopers Digital 2026 aponta prova social escondida como um
+     ponto central — e a v3 não diferenciava duas pessoas com "site ativo" mas
+     credibilidade real muito diferente. Modifica só Credibilidade, na mesma
+     lógica de "só sinal direto" que já existia (site_desalinhado, estado_urgente).
+
+  3) CRUZAMENTO COM SEGMENTOS AMPLIADOS. NÃO entra nos 3 pilares (fit de
+     segmento é um eixo causal diferente de "visibilidade/credibilidade/
+     estrutura do negócio agora" — misturar quebraria o princípio que a v3 já
+     tinha estabelecido). Vive só no bloco de uso interno: tier de fit
+     (Alto/Médio/Baixo) + ICP correspondente, e um alerta de brand safety
+     quando o texto livre bate em categoria proibida. O campo virou um
+     <select> com os segmentos conhecidos + "Outro" com texto livre, porque
+     testei o matching por palavra-chove em cima de texto 100% livre e ele
+     tinha falso-positivo sério (ex.: "clínica" e "consultório" aparecem em
+     dezenas de segmentos não relacionados). O texto livre ainda existe como
+     fallback ("Outro") com um matcher best-effort — sempre rotulado como
+     sugestão não confirmada, nunca como fato.
+
+  IMPORTANTE: o tier de fit (Alto/Médio/Baixo) e o rótulo de ICP NUNCA
+  aparecem pro lead — só no bloco de uso interno, junto do resto do "achado
+  manual". O <select> visível agrupa os segmentos por perfil (autônomo vs.
+  negócio estabelecido), sem qualquer menção a fit.
+*/
+
+let respostas = [];
+let canaisTags = [];
+let branch = null;
+let step = 0;
+let segmentoInfo = { nome: "(não informado)", icp: null, tier: null, sugestaoBaseadaEm: null, brandSafety: null, confirmado: false };
+
+const Q1 = {
+  texto: "Hoje, seu negócio...",
+  opcoes: [
+    { texto: "Ainda não tem site", tag: "sem_site", branch: "A" },
+    { texto: "Só tem rede social (Instagram, Linktree, etc.)", tag: "so_rede_social", branch: "A" },
+    { texto: "Tem site, mas está desatualizado", tag: "site_desatualizado", branch: "B" },
+    { texto: "Tem site no ar e atualizado", tag: "site_ativo", branch: "B" }
+  ]
+};
+
+const Q2 = {
+  texto: "Como as pessoas te encontram hoje? (pode marcar mais de uma)",
+  tipo: "multi",
+  opcoes: [
+    { texto: "Indicação, boca a boca", tag: "canal_indicacao" },
+    { texto: "Redes sociais", tag: "canal_redes" },
+    { texto: "Busca no Google", tag: "canal_busca" },
+    { texto: "Anúncios pagos", tag: "canal_ads" },
+    { texto: "Não sei dizer", tag: "canal_nao_sabe" }
+  ]
+};
+
+const Q3_branchA = {
+  texto: "Se alguém te procurasse agora no Google, ia encontrar...",
+  opcoes: [
+    { texto: "Nada", tag: "exposicao_nula" },
+    { texto: "Só a rede social", tag: "exposicao_rede" },
+    { texto: "Alguma coisa desatualizada, de outro lugar", tag: "exposicao_desatualizada" },
+    { texto: "Não sei", tag: "exposicao_incerta" }
+  ]
+};
+
+const Q3_branchB = {
+  texto: "Se esse site saísse do ar amanhã...",
+  opcoes: [
+    { texto: "Não faria diferença, ninguém ia notar", tag: "dependencia_baixa" },
+    { texto: "Eu ia sentir falta, mas resolveria rápido", tag: "dependencia_media" },
+    { texto: "Seria um problema sério para o negócio", tag: "dependencia_alta" }
+  ]
+};
+
+const Q4 = {
+  texto: "Quem decide isso no seu negócio?",
+  opcoes: [
+    { texto: "Só eu decido", tag: "decisor_unico" },
+    { texto: "Eu e mais alguém (sócio, diretoria)", tag: "decisor_duplo" },
+    { texto: "Depende da aprovação de mais gente", tag: "decisor_comite" }
+  ]
+};
+
+// NOVO v4 — só aparece se Q4 = decisor_duplo
+const Q4b_decisor = {
+  texto: "Nessa decisão, você é...",
+  opcoes: [
+    { texto: "Quem decide junto, no mesmo nível", tag: "codecisor_igual" },
+    { texto: "Quem propõe, mas quem decide mesmo é a outra pessoa", tag: "codecisor_influenciador" }
+  ]
+};
+
+const Q5_branchA = {
+  texto: "Qual dessas frases combina mais com você hoje?",
+  opcoes: [
+    { texto: "Sei que preciso de algo mais profissional, mas ainda não virou prioridade", tag: "estado_perdido" },
+    { texto: "Sinto que a falta de um site já me custou algumas oportunidades", tag: "estado_urgente" },
+    { texto: "Nunca parei para pensar em ter um site, mas sei que preciso", tag: "estado_sem_prioridade" }
+  ]
+};
+
+const Q5b_branchA = {
+  texto: "Você já tentou ter um site antes?",
+  opcoes: [
+    { texto: "Não, seria a primeira vez", tag: "tentativa_nao" },
+    { texto: "Sim, mas não deu certo (freelancer, plataforma grátis, etc.)", tag: "tentativa_frustrada" }
+  ]
+};
+
+const Q5_branchB = {
+  texto: "Qual é a sua maior dificuldade hoje?",
+  opcoes: [
+    { texto: "Qualquer mudança demora muito ou sai muito caro", tag: "manutencao_travada" },
+    { texto: "Não sei se o site está trazendo algum resultado", tag: "sem_metrica" },
+    { texto: "O site não reflete o que é o meu negócio hoje", tag: "site_desalinhado" },
+    { texto: "Nada me incomoda muito, só queria melhorar", tag: "sem_dor_forte" }
+  ]
+};
+
+const Q6 = {
+  texto: "Quanto você investe hoje em marketing ou presença digital?",
+  opcoes: [
+    { texto: "Nada ainda", tag: "budget_zero" },
+    { texto: "Até R$ 300/mês", tag: "budget_baixo" },
+    { texto: "De R$ 300 a R$ 1.000/mês", tag: "budget_medio" },
+    { texto: "Mais de R$ 1.000/mês", tag: "budget_alto" }
+  ]
+};
+
+// NOVO v4 — universal, alimenta só Credibilidade
+const Q_provaSocial = {
+  texto: "Quem procura por você hoje encontra provas reais do seu trabalho (depoimentos, avaliações, fotos de resultado, cases)?",
+  opcoes: [
+    { texto: "Sim, encontra bastante e de forma fácil", tag: "prova_forte" },
+    { texto: "É um pouco difícil, pois as provas estão espalhadas, mas consegue encontrar", tag: "prova_fraca" },
+    { texto: "Não, pois não existe quase nada hoje na internet", tag: "prova_ausente" }
+  ]
+};
+
+function getSequencia() {
+  const seq = [Q2, branch === "A" ? Q3_branchA : Q3_branchB, Q4];
+  if (respostas.some(r => r.tag === "decisor_duplo")) seq.push(Q4b_decisor);
+  seq.push(branch === "A" ? Q5_branchA : Q5_branchB);
+  if (branch === "A") seq.push(Q5b_branchA);
+  seq.push(Q6);
+  seq.push(Q_provaSocial);
+  return seq;
+}
+
+function achou(tag) {
+  return respostas.some(r => r.tag === tag) || canaisTags.includes(tag);
+}
+
+// ---------- SEGMENTOS (Segmentos_Ampliados_Harvie) ----------
+// Usado só pro bloco de uso interno. O lead nunca vê tier de fit nem rótulo de ICP.
+
+const SEGMENTOS_MINI = {
+  alto: ["Psicólogos e terapeutas autônomos","Fotógrafos freelance","Tradutores e intérpretes","Consultores autônomos (ambiental, RH, editorial)","Advogados autônomos (caso individual)","Designers de interiores autônomos","Personal trainers (consultoria/programa online)","Coaches executivos de ticket alto"],
+  medio: ["Personal trainers (presencial local)","Nutricionistas (clínica geral local)","Nutricionistas (esportiva/funcional, programas pagos)","Coaches de vida/carreira genéricos","Professores particulares (idiomas, música, reforço)","Contadores autônomos (pequeno volume)","Cabeleireiros/barbeiros com marca pessoal","Celebrantes de casamento / wedding planners freelance","Ilustradores, artistas plásticos, músicos solo","Tatuadores autônomos","Confeiteiras/personal chefs (bolos/eventos sob encomenda)"],
+  baixo: ["Esteticistas independentes","Maquiadores freelance","Instrutores de yoga/pilates autônomos","Consultores de imagem/personal stylists","Confeiteiras/personal chefs (entrega do dia a dia)"]
+};
+
+const SEGMENTOS_PROPLUS = {
+  alto: ["Escritórios de advocacia (múltiplos sócios)","Empresas de terceirização/facilities","Incorporadoras","Clínicas odontológicas","Contabilidade/consultoria empresarial para PMEs","Clínicas/hospitais veterinários especializados","Imobiliárias de alto padrão/rural/comercial"],
+  medio: ["Clínicas médicas multiespecialidade","Clínicas de estética avançada","Escolas de idiomas","Cursos preparatórios/concursos","Escolas técnicas","Consultorias de RH/recrutamento executivo","Escritórios de arquitetura","Imobiliárias residenciais genéricas"],
+  baixo: ["Clínicas/consultórios veterinários de rotina","Consultorias de gestão/ESG","Empresas de logística regional","Palestrantes/autores com múltiplos produtos","Criadores de conteúdo com produtos próprios"]
+};
+
+// Hipótese inicial de brand safety (ver ICP_e_Personas_Harvie) — a validar com
+// comercial/jurídico. Nunca exibido ao lead; só vira alerta no bloco interno.
+const BRAND_SAFETY_KEYWORDS = {
+  "Conteúdo adulto ou sexual explícito": ["pornografia","conteudo adulto","acompanhantes","sexo explicito"],
+  "Apostas e jogos não regulamentados": ["aposta esportiva","apostas esportivas","casa de apostas","cassino online","jogo do bicho"],
+  "Esquema de pirâmide ou MLM sem registro": ["piramide","marketing multinivel","recrutamento de downline"],
+  "Promessa de retorno financeiro garantido": ["retorno garantido","lucro garantido","rentabilidade garantida","investimento sem risco"],
+  "Conteúdo político-partidário ou extremista": ["campanha eleitoral","partido politico","candidato a"]
+};
+
+// Palavras genéricas demais pra servir de sinal de match sozinhas. Testado: sem
+// essa lista, "clínica"/"consultório"/"curso"/"online"/"consultor" geravam
+// falso-positivo entre segmentos sem nenhuma relação real entre si.
+const STOPWORDS_SEGMENTO = new Set([
+  "freelance","freelancer","online","local","locais","geral","gerais","autonomo","autonomos",
+  "autonoma","autonomas","servico","servicos","programa","programas","curso","cursos","empresa",
+  "empresas","consultoria","consultorias","negocio","negocios","clinica","clinicas","consultorio","consultorios",
+  "pequeno","pequena","pequenos","pequenas","grande","grandes","multiplo","multiplos","multipla","multiplas",
+  "independente","independentes","profissional","profissionais","marca","pessoal","pessoais",
+  "ticket","volume","modelo","dia","dias","varias","varios","especialidades","especialidade",
+  "consultor","consultora","consultores","consultoras","residencial","residenciais","comercial","comerciais",
+  "padrao","rural","rurais"
+]);
+
+// Sinônimos manuais pra termos que ninguém usa pra descrever a própria
+// profissão (ex: quase ninguém digita "clínica odontológica", digita "dentista")
+const SINONIMOS_EXTRA = {
+  "Clínicas odontológicas": ["dentista","dentistas","odonto"],
+  "Contabilidade/consultoria empresarial para PMEs": ["contador","contadora","contabil"]
+};
+
+function normalizarTexto(str) {
+  return str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+}
+
+function stemPalavra(p) { return p.length > 6 ? p.slice(0, 6) : p; }
+
+function palavrasSignificativas(nome) {
+  const base = normalizarTexto(nome).replace(/[()\/]/g, " ").split(/[\s,]+/)
+    .filter(p => p.length > 3 && !STOPWORDS_SEGMENTO.has(p)).map(stemPalavra);
+  const extras = (SINONIMOS_EXTRA[nome] || []).map(normalizarTexto);
+  return base.concat(extras);
+}
+
+function flattenSegmentos(dict, icp) {
+  const out = [];
+  ["alto","medio","baixo"].forEach(tier => dict[tier].forEach(nome => out.push({ nome, tier, icp, palavras: palavrasSignificativas(nome) })));
+  return out;
+}
+
+const TODOS_SEGMENTOS = flattenSegmentos(SEGMENTOS_MINI, "Mini").concat(flattenSegmentos(SEGMENTOS_PROPLUS, "Pro Plus"));
+
+// Best-effort: sempre rotulado como sugestão não confirmada onde é exibido.
+// Prioriza brand safety — se bater uma categoria proibida, não sugere fit junto,
+// pra não distrair o time comercial do alerta mais importante.
+function identificarSegmentoPorTexto(texto) {
+  const textoNorm = normalizarTexto(texto);
+
+  let brandSafetyFlag = null;
+  Object.keys(BRAND_SAFETY_KEYWORDS).forEach(categoria => {
+    if (BRAND_SAFETY_KEYWORDS[categoria].some(kw => textoNorm.includes(normalizarTexto(kw)))) brandSafetyFlag = categoria;
+  });
+  if (brandSafetyFlag) return { tier: null, icp: null, sugestaoBaseadaEm: null, brandSafety: brandSafetyFlag, confirmado: false };
+
+  let melhor = null, melhorScore = 0;
+  TODOS_SEGMENTOS.forEach(seg => {
+    const score = seg.palavras.filter(p => textoNorm.includes(p)).length;
+    if (score > melhorScore) { melhorScore = score; melhor = seg; }
+  });
+  if (!melhor) return { tier: null, icp: null, sugestaoBaseadaEm: null, brandSafety: null, confirmado: false };
+  return { tier: melhor.tier, icp: melhor.icp, sugestaoBaseadaEm: melhor.nome, brandSafety: null, confirmado: false };
+}
+
+// ---------- RENDER ----------
+
+function renderRaiz() {
+  let html = `<h3>Pergunta 1</h3><p>${Q1.texto}</p>`;
+  Q1.opcoes.forEach((op, i) => html += `<div><button onclick="responderRaiz(${i})">${op.texto}</button></div>`);
+  document.getElementById("quiz").innerHTML = html;
+}
+
+function responderRaiz(i) {
+  const op = Q1.opcoes[i];
+  branch = op.branch;
+  respostas.push({ pergunta: Q1.texto, resposta: op.texto, tag: op.tag });
+  step = 0;
+  renderPergunta();
+}
+
+function renderPergunta() {
+  const seq = getSequencia();
+  const p = seq[step];
+  let html = `<h3>Pergunta ${step + 2}</h3><p>${p.texto}</p>`;
+  if (p.tipo === "multi") {
+    p.opcoes.forEach((op, i) => html += `<div><label><input type="checkbox" id="multi_${i}"> ${op.texto}</label></div>`);
+    html += `<br><button onclick="responderMulti()">Continuar</button>`;
+  } else {
+    p.opcoes.forEach((op, i) => html += `<div><button onclick="responder(${i})">${op.texto}</button></div>`);
+  }
+  document.getElementById("quiz").innerHTML = html;
+}
+
+function responder(i) {
+  const seqAntes = getSequencia();
+  const p = seqAntes[step];
+  const op = p.opcoes[i];
+  respostas.push({ pergunta: p.texto, resposta: op.texto, tag: op.tag });
+  step++;
+  // recalcula DEPOIS de registrar a resposta: ela pode ter mudado a sequência
+  // (ex: Q4b só existe se a resposta que acabou de entrar foi decisor_duplo)
+  const seqDepois = getSequencia();
+  if (step < seqDepois.length) renderPergunta(); else renderSegmentoOpcional();
+}
+
+function responderMulti() {
+  const seqAntes = getSequencia();
+  const p = seqAntes[step];
+  const escolhidas = [];
+  p.opcoes.forEach((op, i) => {
+    if (document.getElementById("multi_" + i).checked) {
+      escolhidas.push(op.texto);
+      canaisTags.push(op.tag);
+    }
+  });
+  respostas.push({ pergunta: p.texto, resposta: escolhidas.length ? escolhidas.join(", ") : "(nenhuma marcada)", tag: "canais_multi" });
+  step++;
+  renderPergunta();
+}
+
+function renderSegmentoOpcional() {
+  let html = `<h3>Pergunta 8</h3><p>Qual o seu segmento de atuação?</p>`;
+  html += `<select id="campoSegmentoSelect" onchange="onSegmentoChange()">`;
+  html += `<option value="">— Selecione —</option>`;
+  html += `<optgroup label="Perfil autônomo / reputação pessoal">`;
+  flattenSegmentos(SEGMENTOS_MINI, "Mini").forEach(seg => html += `<option value="${seg.nome}">${seg.nome}</option>`);
+  html += `</optgroup>`;
+  html += `<optgroup label="Negócio estabelecido / múltiplas frentes">`;
+  flattenSegmentos(SEGMENTOS_PROPLUS, "Pro Plus").forEach(seg => html += `<option value="${seg.nome}">${seg.nome}</option>`);
+  html += `</optgroup>`;
+  html += `<option value="__outro__">Outro (não está na lista)</option>`;
+  html += `</select>`;
+  html += `<div id="campoOutroWrapper" style="display:none;"><br><input type="text" id="campoOutroTexto" placeholder="Descreva em poucas palavras..."></div>`;
+  html += `<br><br><button onclick="finalizar()">Ver resultado</button>`;
+  document.getElementById("quiz").innerHTML = html;
+}
+
+function onSegmentoChange() {
+  const val = document.getElementById("campoSegmentoSelect").value;
+  document.getElementById("campoOutroWrapper").style.display = (val === "__outro__") ? "block" : "none";
+}
+
+function finalizar() {
+  const valorSelect = document.getElementById("campoSegmentoSelect").value;
+
+  if (valorSelect && valorSelect !== "__outro__") {
+    const encontrado = TODOS_SEGMENTOS.find(s => s.nome === valorSelect);
+    respostas.push({ pergunta: "O que você faz?", resposta: valorSelect, tag: "segmento_livre" });
+    segmentoInfo = { nome: valorSelect, icp: encontrado.icp, tier: encontrado.tier, sugestaoBaseadaEm: null, brandSafety: null, confirmado: true };
+  } else {
+    const campoOutro = document.getElementById("campoOutroTexto");
+    const textoLivre = (campoOutro ? campoOutro.value : "").trim() || "(não informado)";
+    respostas.push({ pergunta: "O que você faz?", resposta: textoLivre, tag: "segmento_livre" });
+    segmentoInfo = Object.assign({ nome: textoLivre }, identificarSegmentoPorTexto(textoLivre));
+  }
+
+  mostrarResultado();
+}
+
+// ---------- CÁLCULO DOS PILARES ----------
+
+function calcularVisibilidade() {
+  const siteForca = { sem_site: 0, so_rede_social: 1, site_desatualizado: 1, site_ativo: 2 };
+  const canalForca = { canal_indicacao: 0, canal_nao_sabe: 0, canal_redes: 1, canal_ads: 2, canal_busca: 3 };
+
+  const siteTag = respostas.find(r => ["sem_site","so_rede_social","site_desatualizado","site_ativo"].includes(r.tag));
+  const siteatual = siteTag ? siteForca[siteTag.tag] : 0;
+
+  const melhorCanal = canaisTags.reduce((max, tag) => Math.max(max, canalForca[tag] || 0), 0);
+
+  const raw = siteatual + melhorCanal;
+  if (raw <= 1) return 0;
+  if (raw <= 3) return 1;
+  if (raw === 4) return 2;
+  return 3;
+}
+
+function calcularCredibilidade() {
+  let base;
+  if (achou("site_ativo")) base = 3;
+  else if (achou("site_desatualizado")) base = 1;
+  else base = 0;
+
+  if (achou("site_desalinhado")) base -= 1;
+  if (achou("estado_urgente")) base -= 1;
+  // NOVO v4 — prova social é tão sinal direto de confiança quanto os dois acima
+  if (achou("prova_forte")) base += 1;
+  if (achou("prova_ausente")) base -= 1;
+
+  return Math.max(0, Math.min(3, base));
+}
+
+function calcularEstrutura() {
+  const budgetForca = { budget_zero: 0, budget_baixo: 1, budget_medio: 2, budget_alto: 3 };
+  const budgetTag = respostas.find(r => r.tag && r.tag.startsWith("budget_"));
+  const budget = budgetTag ? budgetForca[budgetTag.tag] : 0;
+
+  // NOVO v4 — decisor_duplo deixou de ser sempre "ágil": só conta como ágil se
+  // for co-decisão simétrica; se o lead precisa convencer alguém, é tão lento
+  // quanto comitê pro efeito prático de velocidade de fechamento.
+  let decisorForca = 0;
+  if (achou("decisor_unico")) decisorForca = 1;
+  else if (achou("decisor_duplo")) decisorForca = achou("codecisor_influenciador") ? 0 : 1;
+
+  let penalidade = 0;
+  if (achou("manutencao_travada")) penalidade += 1;
+  if (achou("sem_metrica")) penalidade += 1;
+
+  const raw = Math.max(0, budget + decisorForca - penalidade);
+  if (raw === 0) return 0;
+  if (raw <= 2) return 1;
+  if (raw === 3) return 2;
+  return 3;
+}
+
+// ---------- TEXTOS ----------
+
+const TEXTOS_PILAR = {
+  V: {
+    label: "Visibilidade", pergunta: "te acham fácil?",
+    0: "Hoje, quase ninguém novo chega até você sozinho. Tudo depende de alguém te indicar diretamente.",
+    1: "Você aparece um pouco, mas quem procura por você pode não te achar.",
+    2: "Você já é encontrado por mais de um canal, mas ainda dá para ampliar onde aparece.",
+    3: "Você é encontrado de forma consistente, inclusive por busca ativa. Isso é raro e vale muito."
+  },
+  C: {
+    label: "Credibilidade", pergunta: "quando acham, confiam?",
+    0: "O pouco que existe hoje não é suficiente para alguém confiar no seu trabalho antes de te conhecer pessoalmente.",
+    1: "Existe algo, mas ainda passa uma impressão amadora ou desatualizada.",
+    2: "O que existe já transmite alguma seriedade, mas ainda não está totalmente alinhado com o que você entrega hoje.",
+    3: "O que existe hoje reflete bem quem você é. Isso facilita a decisão de quem está pensando em confiar no seu trabalho."
+  },
+  E: {
+    label: "Estrutura", pergunta: "isso é sustentável?",
+    // Textos separados por branch: pra quem nunca teve site (A) a história é "dar o
+    // primeiro passo"; pra quem já tem site (B) é "sustentar o que já existe" — mesmo
+    // nível numérico, leitura diferente, cada um puxando pro gancho certo depois.
+    A: {
+      0: "Hoje não existe orçamento nem uma forma rápida de decidir sobre presença digital. Faz sentido, já que isso nunca chegou a virar prioridade formal no seu negócio.",
+      1: "Você já tem um começo de orçamento ou de agilidade para decidir, mas não os dois juntos ainda. Isso não é suficiente para dar o primeiro passo com segurança.",
+      2: "Você já tem orçamento e uma forma clara de decidir. Dá para dar esse primeiro passo sem depender de um momento perfeito.",
+      3: "Presença digital já é tratada como prioridade real no seu negócio, com orçamento e decisão organizados. O que falta agora é dar o primeiro passo, não se preparar para ele."
+    },
+    B: {
+      0: "Hoje não há orçamento nem decisão rápida disponíveis para sustentar o site que você já tem. Nesse ponto, manter as coisas como estão já é mais difícil do que parece.",
+      1: "Você já tem um pouco de orçamento ou de agilidade para decidir, mas não os dois juntos. O que existe hoje não é suficiente para manter o site atualizado de forma constante.",
+      2: "Você já tem orçamento e uma forma clara de decidir. Dá para sustentar o site de forma previsível, mesmo que ainda valha revisar como isso é feito hoje.",
+      3: "Presença digital já é tratada como parte do negócio, com investimento e decisão organizados. O que falta é otimizar o que já existe, não recomeçar do zero."
+    }
+  }
+};
+
+function gerarQuickWin(vNivel, cNivel, eNivel) {
+  const niveis = { V: vNivel, C: cNivel, E: eNivel };
+  const maisFraco = Object.keys(niveis).reduce((a, b) => niveis[a] <= niveis[b] ? a : b);
+  const QUICK_WINS = {
+    V: "Cadastre (ou atualize) seu Google Meu Negócio ainda essa semana. É gratuito e é o jeito mais rápido de aparecer para quem busca por você.",
+    C: "Escolha 3 fotos ou informações que mostrem seu trabalho de verdade (não genéricas) e garanta que estejam nos canais que você já usa.",
+    E: "Escreva num papel: 'o que acontece se eu parar de cuidar disso por 3 meses?' Se a resposta te preocupa, isso já é sinal de prioridade."
+  };
+  return { pilar: maisFraco, texto: QUICK_WINS[maisFraco] };
+}
+
+function mostrarResultado() {
+  document.getElementById("quiz").style.display = "none";
+  document.getElementById("resultado").style.display = "block";
+
+  const vNivel = calcularVisibilidade();
+  const cNivel = calcularCredibilidade();
+  const eNivel = calcularEstrutura();
+  const barra = (n) => "●".repeat(n + 1) + "○".repeat(3 - n);
+
+  const achadoPrincipal = respostas.find(r => [
+    "estado_perdido","estado_urgente","estado_sem_prioridade","sem_metrica","site_desalinhado","sem_dor_forte"
+  ].includes(r.tag));
+
+  const tentouAntes = achou("tentativa_frustrada");
+  const manutencaoTravada = achou("manutencao_travada");
+  const provaAusente = achou("prova_ausente");
+  const naoEDecisorFinal = achou("codecisor_influenciador");
+
+  const decisor = respostas.find(r => ["decisor_unico","decisor_duplo","decisor_comite"].includes(r.tag));
+  const budget = respostas.find(r => r.tag && r.tag.startsWith("budget_"));
+
+  let sugestaoInterna = "A validar pelo time comercial";
+  if (branch === "A" && budget && (budget.tag === "budget_zero" || budget.tag === "budget_baixo")) sugestaoInterna = "Harvie Mini";
+  else if (branch === "B") sugestaoInterna = "Harvie Pro Plus (ou Pro/Business dependendo do porte)";
+
+  const quickWin = gerarQuickWin(vNivel, cNivel, eNivel);
+
+  let html = `<h2>Seu diagnóstico</h2>`;
+
+  html += `<h3>${TEXTOS_PILAR.V.label} — ${TEXTOS_PILAR.V.pergunta}</h3><p>${barra(vNivel)}</p><p>${TEXTOS_PILAR.V[vNivel]}</p>`;
+  html += `<h3>${TEXTOS_PILAR.C.label} — ${TEXTOS_PILAR.C.pergunta}</h3><p>${barra(cNivel)}</p><p>${TEXTOS_PILAR.C[cNivel]}</p>`;
+  html += `<h3>${TEXTOS_PILAR.E.label} — ${TEXTOS_PILAR.E.pergunta}</h3><p>${barra(eNivel)}</p><p>${TEXTOS_PILAR.E[branch][eNivel]}</p>`;
+
+  if (achadoPrincipal) html += `<p><i>Ponto que você destacou: "${achadoPrincipal.resposta}"</i></p>`;
+
+  if (tentouAntes) {
+    html += `<p><b>Um detalhe importante:</b> você já tentou ter um site antes e não deu certo. Isso acontece mais do que parece: às vezes é o freelancer que some no meio do caminho, o valor que muda depois que o projeto já começou, ou uma plataforma grátis que não aguenta quando o negócio cresce. Quando o site não é feito e cuidado por alguém profissional, fica difícil garantir que ele continue seguro, atualizado e no ar sem interrupções, e é isso que costuma pesar mais lá na frente.</p>`;
+  }
+  if (manutencaoTravada) {
+    html += `<p><b>Um detalhe importante:</b> você mencionou que qualquer alteração no site demora ou custa caro. Isso é comum em sites feitos como um projeto pontual, sem manutenção contínua incluída. Não é um problema seu, é um problema do modelo.</p>`;
+  }
+  if (provaAusente) {
+    html += `<p><b>Um detalhe importante:</b> hoje quase não existe prova real do seu trabalho visível para quem ainda não te conhece. Isso pesa na hora de alguém decidir confiar em você antes do primeiro contato, às vezes até mais do que o site em si.</p>`;
+  }
+
+  html += `<hr><h3>Seu próximo passo (grátis, pode fazer sozinho)</h3><p>${quickWin.texto}</p>`;
+
+  html += `<hr><h4>[uso interno — não mostrar ao lead]</h4>`;
+  html += `<p>Branch: ${branch}</p>`;
+  html += `<p>V=${vNivel} C=${cNivel} E=${eNivel} | Pilar mais fraco: ${quickWin.pilar}</p>`;
+  html += `<p>Sugestão de plano: <b>${sugestaoInterna}</b></p>`;
+  html += `<p>Cenário de decisor: ${decisor ? decisor.resposta : "-"}${naoEDecisorFinal ? " → ⚠ Esse lead NÃO é o decisor final. Preparar material de apoio para ele levar para quem decide." : ""}</p>`;
+
+  html += `<p>Segmento informado: ${segmentoInfo.nome}</p>`;
+  if (segmentoInfo.tier) {
+    const tierLabel = { alto: "🟢 Alto Fit", medio: "🟡 Médio Fit", baixo: "🔴 Baixo Fit" }[segmentoInfo.tier];
+    html += `<p>Fit de segmento (${segmentoInfo.confirmado ? "selecionado pelo lead" : "sugestão automática por palavra-chave, NÃO confirmada"}): <b>${tierLabel}, ICP ${segmentoInfo.icp}</b>${segmentoInfo.sugestaoBaseadaEm ? " · aproximação de: " + segmentoInfo.sugestaoBaseadaEm : ""}</p>`;
+  } else if (segmentoInfo.brandSafety) {
+    html += `<p>⚠️ ALERTA DE BRAND SAFETY: o texto livre pode indicar associação com "${segmentoInfo.brandSafety}". Validar manualmente antes de prosseguir com o atendimento (hipótese automática, não confirmada).</p>`;
+  } else {
+    html += `<p>Fit de segmento: não identificado automaticamente. Validar manualmente.</p>`;
+  }
+
+  html += `<p>Canais marcados: ${canaisTags.join(", ") || "-"}</p>`;
+  html += `<p>Todas as respostas:</p><ul>`;
+  respostas.forEach(r => html += `<li>${r.pergunta} → ${r.resposta}</li>`);
+  html += `</ul>`;
+
+  document.getElementById("resultado").innerHTML = html;
+}
+
+renderRaiz();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,26 @@
+# Dependências e build
+node_modules/
+dist/
+
+# Variáveis de ambiente / segredos
+.env
+.env.*
+!.env.example
+
+# Vercel
+.vercel
+
+# Projetos não-relacionados que vivem nesta mesma pasta (não fazem parte do
+# Harvie Raio-X — não devem ir para este repositório)
+coopers-hub/
+coopers-hub.zip
+Claude outputs/
+
+# Editor / SO
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Logs
+npm-debug.log*

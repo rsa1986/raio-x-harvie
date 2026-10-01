@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #020817; }
+  body { -webkit-font-smoothing: antialiased; }
+  a { color: #E2E8F0; text-decoration: none; }
+  a:hover { color: #FFFFFF; }
+  select option { background: #0B1220; color: #FFFFFF; }
+  select optgroup { background: #0B1220; color: #9CA3AF; }
+  ::placeholder { color: #6B7280; }
+</style>
+</helmet>
+
+<div style="font-family: 'Bricolage Grotesque', Helvetica, sans-serif; color: #FFFFFF; background: #020817; min-height: 100vh;">
+
+  <header style="position: sticky; top: 0; z-index: 20; background: rgba(2,8,23,0.82); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,0.07);">
+    <div style="max-width: 1160px; margin: 0 auto; padding: 18px 24px; display: flex; align-items: center; justify-content: space-between; gap: 24px;">
+      <div style="display: flex; align-items: center; gap: 14px;">
+        <img src="assets/harvie-logo-white.png" alt="Harvie" style="height: 26px; width: auto; display: block;">
+        <span style="font-size: 12px; color: #9CA3AF;">by coopers.digital</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 24px;">
+        <a href="{{ harvieUrl }}" target="_blank" style="font-size: 15px; font-weight: 500; color: #E2E8F0;">Planos e Preços</a>
+        <a href="#quiz" style="font-size: 15px; font-weight: 700; color: #FFFFFF; background: linear-gradient(90deg, #FF8A00, #D25C9C); padding: 11px 22px; border-radius: 999px;" style-hover="opacity: 0.9;">Fazer o raio-X</a>
+      </div>
+    </div>
+  </header>
+
+  <section style="background-image: linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px); background-size: 72px 72px; border-bottom: 1px solid rgba(255,255,255,0.06);">
+    <div style="max-width: 1160px; margin: 0 auto; padding: 96px 24px 84px; display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 64px; align-items: center;">
+      <div>
+        <div style="display: inline-flex; align-items: center; gap: 9px; font-size: 13px; font-weight: 500; color: #E2E8F0; background: #111827; border: 1px solid rgba(255,255,255,0.08); padding: 8px 16px; border-radius: 999px; white-space: nowrap;">
+          <span style="width: 7px; height: 7px; border-radius: 999px; background: #FF8A00; display: block;"></span>
+          Diagnóstico gratuito · 2 minutos
+        </div>
+        <h1 style="font-size: 68px; line-height: 1.0; letter-spacing: -0.035em; font-weight: 700; margin: 26px 0 22px;">Raio-X da sua<br><span style="background: linear-gradient(90deg, #FF8A00, #D25C9C 45%, #6B7DE5); -webkit-background-clip: text; background-clip: text; color: transparent;">presença digital</span></h1>
+        <p style="font-size: 20px; line-height: 1.55; color: #E2E8F0; max-width: 38ch; margin: 0 0 36px; text-wrap: pretty;">Descubra se te acham, se confiam em você, e se isso é sustentável. Resultado na hora, sem cadastro.</p>
+        <div style="display: flex; align-items: center; gap: 28px; flex-wrap: wrap;">
+          <a href="#quiz" style="font-size: 16px; font-weight: 700; color: #FFFFFF; background: linear-gradient(90deg, #FF8A00, #D25C9C); padding: 17px 30px; border-radius: 999px; display: inline-flex; align-items: center; gap: 12px;" style-hover="opacity: 0.9;">Começar o raio-X <span style="font-weight: 400;">→</span></a>
+          <span style="font-size: 14px; color: #9CA3AF;">8 perguntas · sem e-mail · resultado imediato</span>
+        </div>
+        <div style="display: flex; gap: 56px; margin-top: 56px;">
+          <div>
+            <div style="font-size: 26px; font-weight: 700; letter-spacing: -0.02em;">3</div>
+            <div style="font-size: 14px; color: #9CA3AF;">Pilares avaliados</div>
+          </div>
+          <div>
+            <div style="font-size: 26px; font-weight: 700; letter-spacing: -0.02em;">2 min</div>
+            <div style="font-size: 14px; color: #9CA3AF;">Para responder</div>
+          </div>
+          <div>
+            <div style="font-size: 26px; font-weight: 700; letter-spacing: -0.02em;">R$ 0</div>
+            <div style="font-size: 14px; color: #9CA3AF;">Sem gate de contato</div>
+          </div>
+        </div>
+      </div>
+      <div style="border: 1px solid rgba(255,255,255,0.08); border-radius: 24px; background: #0B1220; padding: 34px; position: relative; overflow: hidden;">
+        <img src="assets/harvie-lion.png" alt="" style="position: absolute; right: -70px; top: -40px; width: 300px; opacity: 0.13; pointer-events: none;">
+        <div style="font-size: 13px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: #9CA3AF; margin-bottom: 26px; position: relative;">O que você recebe</div>
+        <div style="display: grid; gap: 22px;">
+          <div>
+            <div style="display: flex; gap: 5px; margin-bottom: 12px;">
+              <span style="width: 9px; height: 9px; border-radius: 999px; background: #FF8A00; display: block;"></span>
+              <span style="width: 9px; height: 9px; border-radius: 999px; background: #D25C9C; display: block;"></span>
+              <span style="width: 9px; height: 9px; border-radius: 999px; background: rgba(255,255,255,0.14); display: block;"></span>
+              <span style="width: 9px; height: 9px; border-radius: 999px; background: rgba(255,255,255,0.14); display: block;"></span>
+            </div>
+            <div style="font-size: 16px; font-weight: 700;">Nota em 3 pilares</div>
+            <div style="font-size: 15px; color: #9CA3AF; line-height: 1.5;">Visibilidade, credibilidade e estrutura, com leitura escrita para o seu caso.</div>
+          </div>
+          <div style="height: 1px; background: rgba(255,255,255,0.07);"></div>
+          <div>
+            <div style="font-size: 16px; font-weight: 700;">Um próximo passo grátis</div>
+            <div style="font-size: 15px; color: #9CA3AF; line-height: 1.5;">Uma ação prática que você pode executar sozinho, hoje, sem contratar ninguém.</div>
+          </div>
+          <div style="height: 1px; background: rgba(255,255,255,0.07);"></div>
+          <div>
+            <div style="font-size: 16px; font-weight: 700;">Nada de gate antes do valor</div>
+            <div style="font-size: 15px; color: #9CA3AF; line-height: 1.5;">O resultado aparece na tela. Você decide se quer falar com a gente depois.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="border-bottom: 1px solid rgba(255,255,255,0.06);">
+    <div style="max-width: 1160px; margin: 0 auto; padding: 84px 24px;">
+      <div style="font-size: 13px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: #9CA3AF; margin-bottom: 44px;">Os três pilares</div>
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+        <div style="background: #1F2937; border: 1px solid rgba(255,255,255,0.06); border-radius: 22px; padding: 34px;">
+          <div style="font-size: 14px; font-weight: 700; color: #FF8A00; margin-bottom: 16px;">01</div>
+          <div style="font-size: 30px; font-weight: 700; letter-spacing: -0.025em; margin-bottom: 12px;">Visibilidade</div>
+          <div style="font-size: 17px; line-height: 1.55; color: #D1D5D9;">Te acham fácil? Ou toda oportunidade nova depende de alguém te indicar pessoalmente.</div>
+        </div>
+        <div style="background: #1F2937; border: 1px solid rgba(255,255,255,0.06); border-radius: 22px; padding: 34px;">
+          <div style="font-size: 14px; font-weight: 700; color: #D25C9C; margin-bottom: 16px;">02</div>
+          <div style="font-size: 30px; font-weight: 700; letter-spacing: -0.025em; margin-bottom: 12px;">Credibilidade</div>
+          <div style="font-size: 17px; line-height: 1.55; color: #D1D5D9;">Quando acham, confiam? O que existe hoje sustenta a decisão antes do primeiro contato.</div>
+        </div>
+        <div style="background: #1F2937; border: 1px solid rgba(255,255,255,0.06); border-radius: 22px; padding: 34px;">
+          <div style="font-size: 14px; font-weight: 700; color: #6B7DE5; margin-bottom: 16px;">03</div>
+          <div style="font-size: 30px; font-weight: 700; letter-spacing: -0.025em; margin-bottom: 12px;">Estrutura</div>
+          <div style="font-size: 17px; line-height: 1.55; color: #D1D5D9;">Isso é sustentável? Orçamento e decisão organizados, ou tudo depende do momento perfeito.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="quiz" style="max-width: 900px; margin: 0 auto; padding: 88px 24px 96px;">
+
+    <sc-if value="{{ isIntro }}" hint-placeholder-val="{{ true }}">
+      <div style="border: 1px solid rgba(255,255,255,0.08); border-radius: 26px; background: #0B1220; padding: 60px 48px; text-align: center;">
+        <h2 style="font-size: 40px; font-weight: 700; letter-spacing: -0.03em; margin: 0 0 16px;">Vamos ao raio-X</h2>
+        <p style="font-size: 18px; color: #E2E8F0; line-height: 1.55; max-width: 48ch; margin: 0 auto 34px;">São 8 perguntas curtas sobre como o seu negócio aparece hoje. Nenhuma resposta certa ou errada.</p>
+        <button onClick="{{ iniciar }}" style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 17px; font-weight: 700; color: #FFFFFF; background: linear-gradient(90deg, #FF8A00, #D25C9C); border: 0; padding: 18px 36px; border-radius: 999px; cursor: pointer;" style-hover="opacity: 0.9;">Começar agora</button>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isPergunta }}">
+      <div style="border: 1px solid rgba(255,255,255,0.08); border-radius: 26px; background: #0B1220; padding: 42px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 12px;">
+          <span style="font-size: 13px; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; color: #9CA3AF;">Pergunta {{ numero }} de {{ total }}</span>
+          <button onClick="{{ voltar }}" style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 14px; font-weight: 500; color: #9CA3AF; background: transparent; border: 0; padding: 4px; cursor: pointer;" style-hover="color: #FFFFFF;">← voltar</button>
+        </div>
+        <div style="height: 4px; border-radius: 999px; background: rgba(255,255,255,0.09); overflow: hidden; margin-bottom: 32px;">
+          <div style="height: 100%; background: linear-gradient(90deg, #FF8A00, #D25C9C, #6B7DE5); border-radius: 999px; transition: width 260ms ease; width: {{ progresso }};"></div>
+        </div>
+        <h2 style="font-size: 31px; font-weight: 700; letter-spacing: -0.025em; line-height: 1.2; margin: 0 0 8px; text-wrap: pretty;">{{ perguntaTexto }}</h2>
+        <p style="font-size: 15px; color: #9CA3AF; margin: 0 0 30px;">{{ perguntaDica }}</p>
+        <div style="display: grid; gap: 10px;">
+          <sc-for list="{{ opcoes }}" as="op" hint-placeholder-count="4">
+            <button onClick="{{ op.acao }}" style="font-family: 'Bricolage Grotesque', sans-serif; text-align: left; font-size: 17px; font-weight: 500; line-height: 1.35; color: #FFFFFF; background: {{ op.bg }}; border: 1.5px solid {{ op.borda }}; border-radius: 14px; padding: 19px 22px; cursor: pointer; display: flex; gap: 15px; align-items: center; transition: border-color 140ms ease, background 140ms ease;" style-hover="border-color: #D25C9C; background: #161F31;">
+              <span style="flex: 0 0 auto; width: 20px; height: 20px; border-radius: {{ op.raio }}; border: 1.5px solid {{ op.marcaBorda }}; background: {{ op.marcaFundo }}; display: block;"></span>
+              <span>{{ op.texto }}</span>
+            </button>
+          </sc-for>
+        </div>
+        <sc-if value="{{ isMulti }}">
+          <button onClick="{{ confirmarMulti }}" style="font-family: 'Bricolage Grotesque', sans-serif; margin-top: 26px; font-size: 16px; font-weight: 700; color: #FFFFFF; background: linear-gradient(90deg, #FF8A00, #D25C9C); border: 0; padding: 15px 32px; border-radius: 999px; cursor: pointer;" style-hover="opacity: 0.9;">Continuar</button>
+        </sc-if>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isSegmento }}">
+      <div style="border: 1px solid rgba(255,255,255,0.08); border-radius: 26px; background: #0B1220; padding: 42px;">
+        <span style="font-size: 13px; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; color: #9CA3AF;">Última pergunta · opcional</span>
+        <h2 style="font-size: 31px; font-weight: 700; letter-spacing: -0.025em; line-height: 1.2; margin: 14px 0 8px;">Qual o seu segmento de atuação?</h2>
+        <p style="font-size: 15px; color: #9CA3AF; margin: 0 0 26px;">Serve só para deixar a leitura do resultado mais precisa.</p>
+        <select onChange="{{ mudarSegmento }}" style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 16px; width: 100%; color: #FFFFFF; background: #111827; border: 1.5px solid rgba(255,255,255,0.12); border-radius: 14px; padding: 17px 18px; cursor: pointer; appearance: none;">
+          <option value="">— Selecione —</option>
+          <optgroup label="Perfil autônomo / reputação pessoal">
+            <sc-for list="{{ segsMini }}" as="s" hint-placeholder-count="3">
+              <option value="{{ s.nome }}">{{ s.nome }}</option>
+            </sc-for>
+          </optgroup>
+          <optgroup label="Negócio estabelecido / múltiplas frentes">
+            <sc-for list="{{ segsPro }}" as="s" hint-placeholder-count="3">
+              <option value="{{ s.nome }}">{{ s.nome }}</option>
+            </sc-for>
+          </optgroup>
+          <option value="__outro__">Outro (não está na lista)</option>
+        </select>
+        <sc-if value="{{ mostrarOutro }}">
+          <input type="text" onChange="{{ mudarOutro }}" placeholder="Descreva em poucas palavras..." style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 16px; width: 100%; margin-top: 12px; color: #FFFFFF; background: #111827; border: 1.5px solid rgba(255,255,255,0.12); border-radius: 14px; padding: 17px 18px;">
+        </sc-if>
+        <div style="display: flex; align-items: center; gap: 22px; margin-top: 30px; flex-wrap: wrap;">
+          <button onClick="{{ finalizar }}" style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 17px; font-weight: 700; color: #FFFFFF; background: linear-gradient(90deg, #FF8A00, #D25C9C); border: 0; padding: 17px 34px; border-radius: 999px; cursor: pointer;" style-hover="opacity: 0.9;">Ver meu resultado</button>
+          <button onClick="{{ finalizar }}" style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 14px; font-weight: 500; color: #9CA3AF; background: transparent; border: 0; cursor: pointer;" style-hover="color: #FFFFFF;">prefiro não informar</button>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isResultado }}">
+      <div>
+        <div style="text-align: center; margin-bottom: 38px;">
+          <span style="font-size: 13px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: #FF8A00;">Resultado</span>
+          <h2 style="font-size: 46px; font-weight: 700; letter-spacing: -0.03em; margin: 12px 0 0;">Seu diagnóstico</h2>
+        </div>
+
+        <div style="display: grid; gap: 14px;">
+          <sc-for list="{{ res.pilares }}" as="p" hint-placeholder-count="3">
+            <div style="border: 1px solid rgba(255,255,255,0.08); border-radius: 22px; background: #0B1220; padding: 30px 34px; display: grid; grid-template-columns: 220px 1fr; gap: 34px; align-items: start;">
+              <div>
+                <div style="font-size: 23px; font-weight: 700; letter-spacing: -0.02em;">{{ p.label }}</div>
+                <div style="font-size: 15px; color: #9CA3AF; margin-bottom: 16px;">{{ p.pergunta }}</div>
+                <div style="display: flex; gap: 6px;">
+                  <sc-for list="{{ p.dots }}" as="d" hint-placeholder-count="4">
+                    <span style="width: 11px; height: 11px; border-radius: 999px; display: block; background: {{ d.cor }};"></span>
+                  </sc-for>
+                </div>
+              </div>
+              <div style="font-size: 17px; line-height: 1.6; color: #D1D5D9; text-wrap: pretty;">{{ p.texto }}</div>
+            </div>
+          </sc-for>
+        </div>
+
+        <sc-if value="{{ res.temAchado }}">
+          <div style="margin-top: 16px; border-left: 2px solid #FF8A00; padding: 4px 0 4px 20px; font-size: 17px; color: #9CA3AF; font-style: italic;">Ponto que você destacou: “{{ res.achado }}”</div>
+        </sc-if>
+
+        <sc-if value="{{ res.temNotas }}">
+          <div style="display: grid; gap: 12px; margin-top: 30px;">
+            <sc-for list="{{ res.notas }}" as="n" hint-placeholder-count="2">
+              <div style="background: #1F2937; border: 1px solid rgba(255,255,255,0.06); border-radius: 20px; padding: 26px 30px;">
+                <div style="font-size: 13px; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; color: #D25C9C; margin-bottom: 10px;">Um detalhe importante</div>
+                <div style="font-size: 16px; line-height: 1.65; color: #E2E8F0; text-wrap: pretty;">{{ n.texto }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <div style="margin-top: 30px; border-radius: 24px; padding: 2px; background: linear-gradient(90deg, #FF8A00, #D25C9C, #6B7DE5);">
+          <div style="background: #050D1F; border-radius: 22px; padding: 40px;">
+            <div style="font-size: 13px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: #FF8A00; margin-bottom: 14px;">Seu próximo passo · grátis, pode fazer sozinho</div>
+            <div style="font-size: 22px; line-height: 1.5; font-weight: 500; letter-spacing: -0.01em; text-wrap: pretty;">{{ res.quickWin }}</div>
+          </div>
+        </div>
+
+        <div style="margin-top: 26px; border: 1px solid rgba(255,255,255,0.08); border-radius: 22px; background: #0B1220; padding: 36px 40px; display: grid; grid-template-columns: 1fr auto; gap: 34px; align-items: center;">
+          <div>
+            <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 10px;">
+              <img src="assets/harvie-lion.png" alt="" style="height: 44px; width: auto; display: block;">
+              <div style="font-size: 25px; font-weight: 700; letter-spacing: -0.025em;">Quer que a gente cuide disso pra você?</div>
+            </div>
+            <div style="font-size: 16px; color: #9CA3AF; line-height: 1.55;">O <span style="font-family: Rubik, sans-serif; font-weight: 500; color: #FFFFFF;">Harvie</span> é site por assinatura: feito, hospedado e mantido atualizado por profissionais, com preços transparentes.</div>
+          </div>
+          <a href="{{ harvieUrl }}" target="_blank" style="font-size: 16px; font-weight: 700; color: #FFFFFF; background: linear-gradient(90deg, #FF8A00, #D25C9C); padding: 16px 30px; border-radius: 999px; white-space: nowrap;" style-hover="opacity: 0.9;">Ver planos e preços</a>
+        </div>
+
+        <div style="margin-top: 22px; text-align: center;">
+          <button onClick="{{ reiniciar }}" style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 14px; font-weight: 500; color: #9CA3AF; background: transparent; border: 0; cursor: pointer;" style-hover="color: #FFFFFF;">refazer o raio-X</button>
+        </div>
+
+        <sc-if value="{{ mostrarInterno }}">
+          <div style="margin-top: 52px; border: 1px dashed rgba(255,255,255,0.16); border-radius: 18px; background: rgba(255,255,255,0.02); padding: 26px 30px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px;">
+              <div style="font-size: 12px; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; color: #6B7280;">[uso interno — não mostrar ao lead]</div>
+              <button onClick="{{ alternarInterno }}" style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 12px; color: #6B7280; background: transparent; border: 0; cursor: pointer;" style-hover="color: #FFFFFF;">{{ rotuloInterno }}</button>
+            </div>
+            <sc-if value="{{ internoAberto }}">
+              <div style="display: grid; gap: 10px; margin-top: 20px; font-size: 13.5px; line-height: 1.6; color: #D1D5D9;">
+                <sc-for list="{{ res.interno }}" as="l" hint-placeholder-count="6">
+                  <div><span style="color: #6B7280;">{{ l.label }}</span> {{ l.valor }}</div>
+                </sc-for>
+                <div style="margin-top: 8px; color: #6B7280;">Todas as respostas</div>
+                <sc-for list="{{ res.log }}" as="r" hint-placeholder-count="4">
+                  <div style="padding-left: 14px; border-left: 1px solid rgba(255,255,255,0.12);">{{ r.pergunta }} → <span style="color: #FFFFFF;">{{ r.resposta }}</span></div>
+                </sc-for>
+              </div>
+            </sc-if>
+          </div>
+        </sc-if>
+      </div>
+    </sc-if>
+  </section>
+
+  <section style="border-top: 1px solid rgba(255,255,255,0.06);">
+    <div style="max-width: 1160px; margin: 0 auto; padding: 76px 24px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 48px;">
+      <div>
+        <div style="font-size: 20px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 10px;">Por que é grátis?</div>
+        <div style="font-size: 16px; line-height: 1.6; color: #9CA3AF;">Porque é assim que a gente mostra como pensa antes de você precisar decidir qualquer coisa.</div>
+      </div>
+      <div>
+        <div style="font-size: 20px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 10px;">Não pedimos seu e-mail</div>
+        <div style="font-size: 16px; line-height: 1.6; color: #9CA3AF;">O diagnóstico aparece na tela, na hora. Contato só se você quiser continuar a conversa.</div>
+      </div>
+      <div>
+        <div style="font-size: 20px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 10px;">Feito pela Coopers</div>
+        <div style="font-size: 16px; line-height: 1.6; color: #9CA3AF;">Produtora digital desde 2013, em Curitiba. O Harvie é o nosso produto de site por assinatura.</div>
+      </div>
+    </div>
+  </section>
+
+  <footer style="border-top: 1px solid rgba(255,255,255,0.06);">
+    <div style="max-width: 1160px; margin: 0 auto; padding: 36px 24px; display: flex; align-items: center; justify-content: space-between; gap: 24px;">
+      <img src="assets/harvie-logo-white.png" alt="Harvie" style="height: 22px; width: auto; display: block;">
+      <span style="font-size: 13px; color: #6B7280;">Coopers Digital Production · Curitiba, BR</span>
+    </div>
+  </footer>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;harvieUrl&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;https://harvie.coopers.digital/&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;mostrarBlocoInterno&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;}}">
+class Component extends DCLogic {
+  state = { fase: "intro", respostas: [], canaisTags: [], branch: null, step: 0, multi: {}, segSelect: "", segOutro: "", segInfo: null, internoAberto: false };
+
+  constructor(props) {
+    super(props);
+    this.Q1 = {
+      texto: "Hoje, seu negócio...", dica: "Escolha a opção mais próxima da realidade.",
+      opcoes: [
+        { texto: "Ainda não tem site", tag: "sem_site", branch: "A" },
+        { texto: "Só tem rede social (Instagram, Linktree, etc.)", tag: "so_rede_social", branch: "A" },
+        { texto: "Tem site, mas está desatualizado", tag: "site_desatualizado", branch: "B" },
+        { texto: "Tem site no ar e atualizado", tag: "site_ativo", branch: "B" }
+      ]
+    };
+    this.Q2 = {
+      texto: "Como as pessoas te encontram hoje?", dica: "Pode marcar mais de uma.", tipo: "multi",
+      opcoes: [
+        { texto: "Indicação, boca a boca", tag: "canal_indicacao" },
+        { texto: "Redes sociais", tag: "canal_redes" },
+        { texto: "Busca no Google", tag: "canal_busca" },
+        { texto: "Anúncios pagos", tag: "canal_ads" },
+        { texto: "Não sei dizer", tag: "canal_nao_sabe" }
+      ]
+    };
+    this.Q3A = {
+      texto: "Se alguém te procurasse agora no Google, ia encontrar...", dica: "Pense em quem ainda não te conhece.",
+      opcoes: [
+        { texto: "Nada", tag: "exposicao_nula" },
+        { texto: "Só a rede social", tag: "exposicao_rede" },
+        { texto: "Alguma coisa desatualizada, de outro lugar", tag: "exposicao_desatualizada" },
+        { texto: "Não sei", tag: "exposicao_incerta" }
+      ]
+    };
+    this.Q3B = {
+      texto: "Se esse site saísse do ar amanhã...", dica: "Sem meio-termo: qual seria o impacto real?",
+      opcoes: [
+        { texto: "Não faria diferença, ninguém ia notar", tag: "dependencia_baixa" },
+        { texto: "Eu ia sentir falta, mas resolveria rápido", tag: "dependencia_media" },
+        { texto: "Seria um problema sério para o negócio", tag: "dependencia_alta" }
+      ]
+    };
+    this.Q4 = {
+      texto: "Quem decide isso no seu negócio?", dica: "Sobre investir em presença digital.",
+      opcoes: [
+        { texto: "Só eu decido", tag: "decisor_unico" },
+        { texto: "Eu e mais alguém (sócio, diretoria)", tag: "decisor_duplo" },
+        { texto: "Depende da aprovação de mais gente", tag: "decisor_comite" }
+      ]
+    };
+    this.Q4b = {
+      texto: "Nessa decisão, você é...", dica: "",
+      opcoes: [
+        { texto: "Quem decide junto, no mesmo nível", tag: "codecisor_igual" },
+        { texto: "Quem propõe, mas quem decide mesmo é a outra pessoa", tag: "codecisor_influenciador" }
+      ]
+    };
+    this.Q5A = {
+      texto: "Qual dessas frases combina mais com você hoje?", dica: "",
+      opcoes: [
+        { texto: "Sei que preciso de algo mais profissional, mas ainda não virou prioridade", tag: "estado_perdido" },
+        { texto: "Sinto que a falta de um site já me custou algumas oportunidades", tag: "estado_urgente" },
+        { texto: "Nunca parei para pensar em ter um site, mas sei que preciso", tag: "estado_sem_prioridade" }
+      ]
+    };
+    this.Q5bA = {
+      texto: "Você já tentou ter um site antes?", dica: "",
+      opcoes: [
+        { texto: "Não, seria a primeira vez", tag: "tentativa_nao" },
+        { texto: "Sim, mas não deu certo (freelancer, plataforma grátis, etc.)", tag: "tentativa_frustrada" }
+      ]
+    };
+    this.Q5B = {
+      texto: "Qual é a sua maior dificuldade hoje?", dica: "",
+      opcoes: [
+        { texto: "Qualquer mudança demora muito ou sai muito caro", tag: "manutencao_travada" },
+        { texto: "Não sei se o site está trazendo algum resultado", tag: "sem_metrica" },
+        { texto: "O site não reflete o que é o meu negócio hoje", tag: "site_desalinhado" },
+        { texto: "Nada me incomoda muito, só queria melhorar", tag: "sem_dor_forte" }
+      ]
+    };
+    this.Q6 = {
+      texto: "Quanto você investe hoje em marketing ou presença digital?", dica: "Somando tudo, por mês.",
+      opcoes: [
+        { texto: "Nada ainda", tag: "budget_zero" },
+        { texto: "Até R$ 300/mês", tag: "budget_baixo" },
+        { texto: "De R$ 300 a R$ 1.000/mês", tag: "budget_medio" },
+        { texto: "Mais de R$ 1.000/mês", tag: "budget_alto" }
+      ]
+    };
+    this.QProva = {
+      texto: "Quem procura por você hoje encontra provas reais do seu trabalho?",
+      dica: "Depoimentos, avaliações, fotos de resultado, cases.",
+      opcoes: [
+        { texto: "Sim, encontra bastante e de forma fácil", tag: "prova_forte" },
+        { texto: "É um pouco difícil, pois as provas estão espalhadas, mas consegue encontrar", tag: "prova_fraca" },
+        { texto: "Não, pois não existe quase nada hoje na internet", tag: "prova_ausente" }
+      ]
+    };
+
+    this.SEG_MINI = {
+      alto: ["Psicólogos e terapeutas autônomos","Fotógrafos freelance","Tradutores e intérpretes","Consultores autônomos (ambiental, RH, editorial)","Advogados autônomos (caso individual)","Designers de interiores autônomos","Personal trainers (consultoria/programa online)","Coaches executivos de ticket alto"],
+      medio: ["Personal trainers (presencial local)","Nutricionistas (clínica geral local)","Nutricionistas (esportiva/funcional, programas pagos)","Coaches de vida/carreira genéricos","Professores particulares (idiomas, música, reforço)","Contadores autônomos (pequeno volume)","Cabeleireiros/barbeiros com marca pessoal","Celebrantes de casamento / wedding planners freelance","Ilustradores, artistas plásticos, músicos solo","Tatuadores autônomos","Confeiteiras/personal chefs (bolos/eventos sob encomenda)"],
+      baixo: ["Esteticistas independentes","Maquiadores freelance","Instrutores de yoga/pilates autônomos","Consultores de imagem/personal stylists","Confeiteiras/personal chefs (entrega do dia a dia)"]
+    };
+    this.SEG_PRO = {
+      alto: ["Escritórios de advocacia (múltiplos sócios)","Empresas de terceirização/facilities","Incorporadoras","Clínicas odontológicas","Contabilidade/consultoria empresarial para PMEs","Clínicas/hospitais veterinários especializados","Imobiliárias de alto padrão/rural/comercial"],
+      medio: ["Clínicas médicas multiespecialidade","Clínicas de estética avançada","Escolas de idiomas","Cursos preparatórios/concursos","Escolas técnicas","Consultorias de RH/recrutamento executivo","Escritórios de arquitetura","Imobiliárias residenciais genéricas"],
+      baixo: ["Clínicas/consultórios veterinários de rotina","Consultorias de gestão/ESG","Empresas de logística regional","Palestrantes/autores com múltiplos produtos","Criadores de conteúdo com produtos próprios"]
+    };
+    this.BRAND_SAFETY = {
+      "Conteúdo adulto ou sexual explícito": ["pornografia","conteudo adulto","acompanhantes","sexo explicito"],
+      "Apostas e jogos não regulamentados": ["aposta esportiva","apostas esportivas","casa de apostas","cassino online","jogo do bicho"],
+      "Esquema de pirâmide ou MLM sem registro": ["piramide","marketing multinivel","recrutamento de downline"],
+      "Promessa de retorno financeiro garantido": ["retorno garantido","lucro garantido","rentabilidade garantida","investimento sem risco"],
+      "Conteúdo político-partidário ou extremista": ["campanha eleitoral","partido politico","candidato a"]
+    };
+    this.STOPWORDS = new Set(["freelance","freelancer","online","local","locais","geral","gerais","autonomo","autonomos","autonoma","autonomas","servico","servicos","programa","programas","curso","cursos","empresa","empresas","consultoria","consultorias","negocio","negocios","clinica","clinicas","consultorio","consultorios","pequeno","pequena","pequenos","pequenas","grande","grandes","multiplo","multiplos","multipla","multiplas","independente","independentes","profissional","profissionais","marca","pessoal","pessoais","ticket","volume","modelo","dia","dias","varias","varios","especialidades","especialidade","consultor","consultora","consultores","consultoras","residencial","residenciais","comercial","comerciais","padrao","rural","rurais"]);
+    this.SINONIMOS = {
+      "Clínicas odontológicas": ["dentista","dentistas","odonto"],
+      "Contabilidade/consultoria empresarial para PMEs": ["contador","contadora","contabil"]
+    };
+    this.segsMini = this.flatten(this.SEG_MINI, "Mini");
+    this.segsPro = this.flatten(this.SEG_PRO, "Pro Plus");
+    this.todosSegmentos = this.segsMini.concat(this.segsPro);
+
+    this.TEXTOS = {
+      V: { label: "Visibilidade", pergunta: "te acham fácil?",
+        0: "Hoje, quase ninguém novo chega até você sozinho. Tudo depende de alguém te indicar diretamente.",
+        1: "Você aparece um pouco, mas quem procura por você pode não te achar.",
+        2: "Você já é encontrado por mais de um canal, mas ainda dá para ampliar onde aparece.",
+        3: "Você é encontrado de forma consistente, inclusive por busca ativa. Isso é raro e vale muito." },
+      C: { label: "Credibilidade", pergunta: "quando acham, confiam?",
+        0: "O pouco que existe hoje não é suficiente para alguém confiar no seu trabalho antes de te conhecer pessoalmente.",
+        1: "Existe algo, mas ainda passa uma impressão amadora ou desatualizada.",
+        2: "O que existe já transmite alguma seriedade, mas ainda não está totalmente alinhado com o que você entrega hoje.",
+        3: "O que existe hoje reflete bem quem você é. Isso facilita a decisão de quem está pensando em confiar no seu trabalho." },
+      E: { label: "Estrutura", pergunta: "isso é sustentável?",
+        A: {
+          0: "Hoje não existe orçamento nem uma forma rápida de decidir sobre presença digital. Faz sentido, já que isso nunca chegou a virar prioridade formal no seu negócio.",
+          1: "Você já tem um começo de orçamento ou de agilidade para decidir, mas não os dois juntos ainda. Isso não é suficiente para dar o primeiro passo com segurança.",
+          2: "Você já tem orçamento e uma forma clara de decidir. Dá para dar esse primeiro passo sem depender de um momento perfeito.",
+          3: "Presença digital já é tratada como prioridade real no seu negócio, com orçamento e decisão organizados. O que falta agora é dar o primeiro passo, não se preparar para ele."
+        },
+        B: {
+          0: "Hoje não há orçamento nem decisão rápida disponíveis para sustentar o site que você já tem. Nesse ponto, manter as coisas como estão já é mais difícil do que parece.",
+          1: "Você já tem um pouco de orçamento ou de agilidade para decidir, mas não os dois juntos. O que existe hoje não é suficiente para manter o site atualizado de forma constante.",
+          2: "Você já tem orçamento e uma forma clara de decidir. Dá para sustentar o site de forma previsível, mesmo que ainda valha revisar como isso é feito hoje.",
+          3: "Presença digital já é tratada como parte do negócio, com investimento e decisão organizados. O que falta é otimizar o que já existe, não recomeçar do zero."
+        }
+      }
+    };
+    this.QUICK_WINS = {
+      V: "Cadastre (ou atualize) seu Google Meu Negócio ainda essa semana. É gratuito e é o jeito mais rápido de aparecer para quem busca por você.",
+      C: "Escolha 3 fotos ou informações que mostrem seu trabalho de verdade (não genéricas) e garanta que estejam nos canais que você já usa.",
+      E: "Escreva num papel: “o que acontece se eu parar de cuidar disso por 3 meses?” Se a resposta te preocupa, isso já é sinal de prioridade."
+    };
+    this.DOT_CORES = ["#FF8A00", "#E5709C", "#D25C9C", "#6B7DE5"];
+  }
+
+  norm(s) { return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim(); }
+  stem(p) { return p.length > 6 ? p.slice(0, 6) : p; }
+  palavras(nome) {
+    const base = this.norm(nome).replace(/[()\/]/g, " ").split(/[\s,]+/)
+      .filter(p => p.length > 3 && !this.STOPWORDS.has(p)).map(p => this.stem(p));
+    return base.concat((this.SINONIMOS[nome] || []).map(s => this.norm(s)));
+  }
+  flatten(dict, icp) {
+    const out = [];
+    ["alto","medio","baixo"].forEach(tier => dict[tier].forEach(nome => out.push({ nome, tier, icp, palavras: this.palavras(nome) })));
+    return out;
+  }
+  identificarPorTexto(texto) {
+    const t = this.norm(texto);
+    let flag = null;
+    Object.keys(this.BRAND_SAFETY).forEach(cat => {
+      if (this.BRAND_SAFETY[cat].some(kw => t.includes(this.norm(kw)))) flag = cat;
+    });
+    if (flag) return { tier: null, icp: null, sugestaoBaseadaEm: null, brandSafety: flag, confirmado: false };
+    let melhor = null, score = 0;
+    this.todosSegmentos.forEach(seg => {
+      const s = seg.palavras.filter(p => t.includes(p)).length;
+      if (s > score) { score = s; melhor = seg; }
+    });
+    if (!melhor) return { tier: null, icp: null, sugestaoBaseadaEm: null, brandSafety: null, confirmado: false };
+    return { tier: melhor.tier, icp: melhor.icp, sugestaoBaseadaEm: melhor.nome, brandSafety: null, confirmado: false };
+  }
+
+  sequencia(respostas, branch) {
+    const seq = [this.Q2, branch === "A" ? this.Q3A : this.Q3B, this.Q4];
+    if (respostas.some(r => r.tag === "decisor_duplo")) seq.push(this.Q4b);
+    seq.push(branch === "A" ? this.Q5A : this.Q5B);
+    if (branch === "A") seq.push(this.Q5bA);
+    seq.push(this.Q6);
+    seq.push(this.QProva);
+    return seq;
+  }
+  achou(tag) { return this.state.respostas.some(r => r.tag === tag) || this.state.canaisTags.includes(tag); }
+
+  perguntaAtual() {
+    const s = this.state;
+    if (s.branch === null) return this.Q1;
+    return this.sequencia(s.respostas, s.branch)[s.step];
+  }
+
+  responder(op) {
+    const s = this.state;
+    if (s.branch === null) {
+      this.setState({ branch: op.branch, step: 0, respostas: [{ pergunta: this.Q1.texto, resposta: op.texto, tag: op.tag }] });
+      return;
+    }
+    const p = this.perguntaAtual();
+    const respostas = s.respostas.concat([{ pergunta: p.texto, resposta: op.texto, tag: op.tag }]);
+    const step = s.step + 1;
+    const seq = this.sequencia(respostas, s.branch);
+    this.setState({ respostas, step, fase: step < seq.length ? "q" : "segmento" });
+  }
+
+  toggleMulti(i) {
+    const multi = Object.assign({}, this.state.multi);
+    multi[i] = !multi[i];
+    this.setState({ multi });
+  }
+
+  confirmarMulti() {
+    const s = this.state;
+    const p = this.perguntaAtual();
+    const escolhidas = [], tags = [];
+    p.opcoes.forEach((op, i) => { if (s.multi[i]) { escolhidas.push(op.texto); tags.push(op.tag); } });
+    const respostas = s.respostas.concat([{ pergunta: p.texto, resposta: escolhidas.length ? escolhidas.join(", ") : "(nenhuma marcada)", tag: "canais_multi" }]);
+    this.setState({ respostas, canaisTags: s.canaisTags.concat(tags), multi: {}, step: s.step + 1 });
+  }
+
+  voltar() {
+    const s = this.state;
+    if (s.branch !== null && s.step === 0) { this.setState({ branch: null, respostas: [], canaisTags: [], multi: {} }); return; }
+    const respostas = s.respostas.slice();
+    const removida = respostas.pop();
+    const canaisTags = removida && removida.tag === "canais_multi" ? [] : s.canaisTags;
+    this.setState({ respostas, canaisTags, step: Math.max(0, s.step - 1), multi: {}, fase: "q" });
+  }
+
+  finalizar() {
+    const s = this.state;
+    const sel = s.segSelect;
+    let respostas = s.respostas.slice(), segInfo;
+    if (sel && sel !== "__outro__") {
+      const found = this.todosSegmentos.find(x => x.nome === sel);
+      respostas.push({ pergunta: "Segmento", resposta: sel, tag: "segmento_livre" });
+      segInfo = { nome: sel, icp: found.icp, tier: found.tier, sugestaoBaseadaEm: null, brandSafety: null, confirmado: true };
+    } else {
+      const livre = (s.segOutro || "").trim() || "(não informado)";
+      respostas.push({ pergunta: "Segmento", resposta: livre, tag: "segmento_livre" });
+      segInfo = Object.assign({ nome: livre }, this.identificarPorTexto(livre));
+    }
+    this.setState({ respostas, segInfo, fase: "resultado" });
+  }
+
+  calcV() {
+    const siteForca = { sem_site: 0, so_rede_social: 1, site_desatualizado: 1, site_ativo: 2 };
+    const canalForca = { canal_indicacao: 0, canal_nao_sabe: 0, canal_redes: 1, canal_ads: 2, canal_busca: 3 };
+    const siteTag = this.state.respostas.find(r => ["sem_site","so_rede_social","site_desatualizado","site_ativo"].includes(r.tag));
+    const atual = siteTag ? siteForca[siteTag.tag] : 0;
+    const melhor = this.state.canaisTags.reduce((m, t) => Math.max(m, canalForca[t] || 0), 0);
+    const raw = atual + melhor;
+    if (raw <= 1) return 0;
+    if (raw <= 3) return 1;
+    if (raw === 4) return 2;
+    return 3;
+  }
+  calcC() {
+    let base = this.achou("site_ativo") ? 3 : (this.achou("site_desatualizado") ? 1 : 0);
+    if (this.achou("site_desalinhado")) base -= 1;
+    if (this.achou("estado_urgente")) base -= 1;
+    if (this.achou("prova_forte")) base += 1;
+    if (this.achou("prova_ausente")) base -= 1;
+    return Math.max(0, Math.min(3, base));
+  }
+  calcE() {
+    const budgetForca = { budget_zero: 0, budget_baixo: 1, budget_medio: 2, budget_alto: 3 };
+    const bt = this.state.respostas.find(r => r.tag && r.tag.indexOf("budget_") === 0);
+    const budget = bt ? budgetForca[bt.tag] : 0;
+    let dec = 0;
+    if (this.achou("decisor_unico")) dec = 1;
+    else if (this.achou("decisor_duplo")) dec = this.achou("codecisor_influenciador") ? 0 : 1;
+    let pen = 0;
+    if (this.achou("manutencao_travada")) pen += 1;
+    if (this.achou("sem_metrica")) pen += 1;
+    const raw = Math.max(0, budget + dec - pen);
+    if (raw === 0) return 0;
+    if (raw <= 2) return 1;
+    if (raw === 3) return 2;
+    return 3;
+  }
+
+  dots(n) {
+    const out = [];
+    for (let i = 0; i < 4; i++) out.push({ cor: i <= n ? this.DOT_CORES[i] : "rgba(255,255,255,0.14)" });
+    return out;
+  }
+
+  montarResultado() {
+    const s = this.state;
+    const v = this.calcV(), c = this.calcC(), e = this.calcE();
+    const niveis = { V: v, C: c, E: e };
+    const fraco = Object.keys(niveis).reduce((a, b) => niveis[a] <= niveis[b] ? a : b);
+    const achado = s.respostas.find(r => ["estado_perdido","estado_urgente","estado_sem_prioridade","sem_metrica","site_desalinhado","sem_dor_forte"].includes(r.tag));
+    const notas = [];
+    if (this.achou("tentativa_frustrada")) notas.push({ texto: "Você já tentou ter um site antes e não deu certo. Isso acontece mais do que parece: às vezes é o freelancer que some no meio do caminho, o valor que muda depois que o projeto já começou, ou uma plataforma grátis que não aguenta quando o negócio cresce. Quando o site não é feito e cuidado por alguém profissional, fica difícil garantir que ele continue seguro, atualizado e no ar sem interrupções, e é isso que costuma pesar mais lá na frente." });
+    if (this.achou("manutencao_travada")) notas.push({ texto: "Você mencionou que qualquer alteração no site demora ou custa caro. Isso é comum em sites feitos como um projeto pontual, sem manutenção contínua incluída. Não é um problema seu, é um problema do modelo." });
+    if (this.achou("prova_ausente")) notas.push({ texto: "Hoje quase não existe prova real do seu trabalho visível para quem ainda não te conhece. Isso pesa na hora de alguém decidir confiar em você antes do primeiro contato, às vezes até mais do que o site em si." });
+
+    const decisor = s.respostas.find(r => ["decisor_unico","decisor_duplo","decisor_comite"].includes(r.tag));
+    const budget = s.respostas.find(r => r.tag && r.tag.indexOf("budget_") === 0);
+    let plano = "A validar pelo time comercial";
+    if (s.branch === "A" && budget && (budget.tag === "budget_zero" || budget.tag === "budget_baixo")) plano = "Harvie Mini";
+    else if (s.branch === "B") plano = "Harvie Pro Plus (ou Pro/Business dependendo do porte)";
+
+    const seg = s.segInfo || { nome: "(não informado)" };
+    const interno = [
+      { label: "Branch:", valor: s.branch },
+      { label: "Scores:", valor: "V=" + v + " C=" + c + " E=" + e + " · pilar mais fraco: " + fraco },
+      { label: "Sugestão de plano:", valor: plano },
+      { label: "Cenário de decisor:", valor: (decisor ? decisor.resposta : "-") + (this.achou("codecisor_influenciador") ? " → ⚠ NÃO é o decisor final. Preparar material de apoio para levar a quem decide." : "") },
+      { label: "Segmento informado:", valor: seg.nome }
+    ];
+    if (seg.tier) {
+      const tierLabel = { alto: "🟢 Alto Fit", medio: "🟡 Médio Fit", baixo: "🔴 Baixo Fit" }[seg.tier];
+      interno.push({ label: "Fit de segmento (" + (seg.confirmado ? "selecionado pelo lead" : "sugestão automática, NÃO confirmada") + "):", valor: tierLabel + ", ICP " + seg.icp + (seg.sugestaoBaseadaEm ? " · aproximação de: " + seg.sugestaoBaseadaEm : "") });
+    } else if (seg.brandSafety) {
+      interno.push({ label: "⚠️ ALERTA DE BRAND SAFETY:", valor: "texto livre pode indicar associação com “" + seg.brandSafety + "”. Validar manualmente (hipótese automática)." });
+    } else {
+      interno.push({ label: "Fit de segmento:", valor: "não identificado automaticamente. Validar manualmente." });
+    }
+    interno.push({ label: "Canais marcados:", valor: s.canaisTags.join(", ") || "-" });
+
+    return {
+      pilares: [
+        { label: this.TEXTOS.V.label, pergunta: this.TEXTOS.V.pergunta, dots: this.dots(v), texto: this.TEXTOS.V[v] },
+        { label: this.TEXTOS.C.label, pergunta: this.TEXTOS.C.pergunta, dots: this.dots(c), texto: this.TEXTOS.C[c] },
+        { label: this.TEXTOS.E.label, pergunta: this.TEXTOS.E.pergunta, dots: this.dots(e), texto: this.TEXTOS.E[s.branch][e] }
+      ],
+      temAchado: !!achado,
+      achado: achado ? achado.resposta : "",
+      temNotas: notas.length > 0,
+      notas,
+      quickWin: this.QUICK_WINS[fraco],
+      interno,
+      log: s.respostas
+    };
+  }
+
+  renderVals() {
+    const s = this.state;
+    const fase = s.fase;
+    const vals = {
+      harvieUrl: this.props.harvieUrl ?? "https://harvie.coopers.digital/",
+      mostrarInterno: this.props.mostrarBlocoInterno ?? true,
+      internoAberto: s.internoAberto,
+      rotuloInterno: s.internoAberto ? "esconder" : "mostrar",
+      alternarInterno: () => this.setState({ internoAberto: !s.internoAberto }),
+      isIntro: fase === "intro",
+      isPergunta: fase === "q",
+      isSegmento: fase === "segmento",
+      isResultado: fase === "resultado",
+      iniciar: () => this.setState({ fase: "q" }),
+      reiniciar: () => this.setState({ fase: "intro", respostas: [], canaisTags: [], branch: null, step: 0, multi: {}, segSelect: "", segOutro: "", segInfo: null }),
+      voltar: () => this.voltar(),
+      confirmarMulti: () => this.confirmarMulti(),
+      finalizar: () => this.finalizar(),
+      mostrarOutro: s.segSelect === "__outro__",
+      mudarSegmento: (ev) => this.setState({ segSelect: ev.target.value }),
+      mudarOutro: (ev) => this.setState({ segOutro: ev.target.value }),
+      segsMini: this.segsMini,
+      segsPro: this.segsPro
+    };
+
+    if (fase === "q") {
+      const p = this.perguntaAtual();
+      const isMulti = p.tipo === "multi";
+      const total = s.branch === null ? 9 : this.sequencia(s.respostas, s.branch).length + 2;
+      const numero = s.branch === null ? 1 : s.step + 2;
+      vals.perguntaTexto = p.texto;
+      vals.perguntaDica = p.dica || "";
+      vals.numero = numero;
+      vals.total = total;
+      vals.progresso = Math.round((numero - 1) / total * 100) + "%";
+      vals.isMulti = isMulti;
+      vals.opcoes = p.opcoes.map((op, i) => {
+        const on = isMulti && !!s.multi[i];
+        return {
+          texto: op.texto,
+          acao: isMulti ? () => this.toggleMulti(i) : () => this.responder(op),
+          bg: on ? "#1B2438" : "#111827",
+          borda: on ? "#D25C9C" : "rgba(255,255,255,0.10)",
+          raio: isMulti ? "5px" : "999px",
+          marcaBorda: on ? "#D25C9C" : "rgba(255,255,255,0.25)",
+          marcaFundo: on ? "#D25C9C" : "transparent"
+        };
+      });
+    }
+
+    if (fase === "resultado") vals.res = this.montarResultado();
+    return vals;
+  }
+}
+
+</script>
+</body>
+</html>
